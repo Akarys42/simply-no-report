@@ -4,7 +4,7 @@
   "package": "me.akarys.simplynoreport.mixin",
   "compatibilityLevel": "JAVA_17",
   "server": [
-    "MixinChatMessageS2CPacket"
+    "MixinServerPlayNetworkHandler"
   ],
   "injectors": {
     "defaultRequire": 1
