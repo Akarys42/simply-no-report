@@ -22,13 +22,17 @@ public class SimplyNoReport implements ModInitializer {
 			GameRuleRegistry.register("disableChatReport", GameRules.Category.CHAT, GameRuleFactory.createBooleanRule(false));
 	public static final GameRules.Key<EnumRule<DisableChatReportStrategy>> DISABLE_CHAT_REPORT_STRATEGY =
 			GameRuleRegistry.register("disableChatReportStrategy", GameRules.Category.CHAT, GameRuleFactory.createEnumRule(DisableChatReportStrategy.STRIP_SIGNATURE));
+	public static final GameRules.Key<GameRules.BooleanRule> SEND_SIGNATURES_TO_OPERATORS =
+			GameRuleRegistry.register("sendSignaturesToOperators", GameRules.Category.CHAT, GameRuleFactory.createBooleanRule(true));
 
 	public static World WORLD;
+	public static MinecraftServer SERVER;
 
 
 	@Override
 	public void onInitialize() {
 		ServerWorldEvents.LOAD.register((server, world) -> {
+			SERVER = server;
 			WORLD = world;
 		});
 
