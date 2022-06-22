@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SimplyNoReport implements ModInitializer {
-	public static final Logger LOGGER = LoggerFactory.getLogger("nochatreporting");
+	public static final Logger LOGGER = LoggerFactory.getLogger("simplynoreport");
 
 	public static final GameRules.Key<GameRules.BooleanRule> DISABLE_CHAT_REPORT =
 			GameRuleRegistry.register("disableChatReport", GameRules.Category.CHAT, GameRuleFactory.createBooleanRule(false));
