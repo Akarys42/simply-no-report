@@ -1,6 +1,6 @@
-package me.akarys.nochatreporting.mixin;
+package me.akarys.simplynoreport.mixin;
 
-import me.akarys.nochatreporting.ChatReportingStrategy;
+import me.akarys.simplynoreport.DisableChatReportStrategy;
 import net.minecraft.network.encryption.NetworkEncryptionUtils;
 import net.minecraft.network.message.MessageSender;
 import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket;
@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.time.Instant;
 import java.util.Optional;
 
-import static me.akarys.nochatreporting.NoChatReporting.*;
+import static me.akarys.simplynoreport.SimplyNoReport.*;
 
 @Mixin(ChatMessageS2CPacket.class)
 public class MixinChatMessageS2CPacket {
@@ -29,8 +29,8 @@ public class MixinChatMessageS2CPacket {
             return;
         }
 
-        if (!WORLD.getGameRules().getBoolean(DISABLE_CHAT_REPORTING)
-                || WORLD.getGameRules().get(DISABLE_CHAT_REPORTING_STRATEGY).get() != ChatReportingStrategy.STRIP_SIGNATURE) {
+        if (!WORLD.getGameRules().getBoolean(DISABLE_CHAT_REPORT)
+                || WORLD.getGameRules().get(DISABLE_CHAT_REPORT_STRATEGY).get() != DisableChatReportStrategy.STRIP_SIGNATURE) {
             return;
         }
 

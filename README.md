@@ -1,11 +1,11 @@
-# No Chat Reporting
+# Simply No Report
 
 This mod gives the option to server admins to disable chat reporting, in a non-intrusive way. 
 It is **disabled by default** to let everyone decide what they want to do.
 
 ## Usage
 
-This mod is server side only. It can be enabled by setting the `disableChatReporting` gamerule to `true`.
+This mod is server side only. It can be enabled by setting the `disableChatReport` gamerule to `true`.
 
 ## Strategies
 
@@ -16,4 +16,4 @@ issues further down the road. In 1.19.1pre1, each message received by the client
 - `CONVERT_TO_SERVER_MESSAGE`: converts the message to a server message, effectively removing any player
 information tied to the message. It will probably break most mods modifying the chat.
 
-The strategy can be changed by setting the `disableChatReportingStrategy` gamerule.
+The strategy can be changed by setting the `disableChatReportStrategy` gamerule.

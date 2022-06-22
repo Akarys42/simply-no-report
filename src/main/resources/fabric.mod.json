@@ -1,28 +1,28 @@
 {
   "schemaVersion": 1,
-  "id": "nochatreporting",
+  "id": "simplynoreport",
   "version": "${version}",
 
-  "name": "No Chat Reporting",
-  "description": "Allow server admins to disable chat reporting",
+  "name": "Simply No Report",
+  "description": "Give server admins the power to disable chat reports",
   "authors": [
     "Matteo Bertucci <matteo@akarys.me>"
   ],
   "contact": {
-    "sources": "https://git.akarys.me/no-chat-reporting"
+    "sources": "https://git.akarys.me/simply-no-report"
   },
 
   "license": "MIT",
-  "icon": "assets/nochatreporting/icon.png",
+  "icon": "assets/simplynoreport/icon.png",
 
   "environment": "*",
   "entrypoints": {
     "main": [
-      "me.akarys.nochatreporting.NoChatReporting"
+      "me.akarys.simplynoreport.SimplyNoReport"
     ]
   },
   "mixins": [
-    "nochatreporting.mixins.json"
+    "simplynoreport.mixins.json"
   ],
 
   "depends": {
