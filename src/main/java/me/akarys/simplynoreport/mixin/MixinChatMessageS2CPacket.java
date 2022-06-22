@@ -21,7 +21,7 @@ import java.util.Optional;
 import static me.akarys.simplynoreport.SimplyNoReport.*;
 
 @Mixin(ChatMessageS2CPacket.class)
-public class MixinChatMessageS2CPacket {
+abstract public class MixinChatMessageS2CPacket {
     @Mutable
     @Shadow @Final private NetworkEncryptionUtils.SignatureData saltSignature;
 
