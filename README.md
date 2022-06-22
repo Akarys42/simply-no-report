@@ -16,9 +16,9 @@ issues further down the road. In 1.19.1pre1, each message received by the client
 - `CONVERT_TO_SERVER_MESSAGE`: converts the message to a server message, effectively removing any player
 information tied to the message. It will probably break most mods modifying the chat.
 
+The strategy can be changed by setting the `disableChatReportStrategy` gamerule.
+
 ## Operator Bypass
 
 If you are using the `STRIP_SIGNATURE` strategy, operators will continue to receive signed messages.
 It can be disabled using the `sendSignaturesToOperators` gamerule.
-
-The strategy can be changed by setting the `disableChatReportStrategy` gamerule.
