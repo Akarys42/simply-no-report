@@ -12,7 +12,7 @@ This mod is server side only. It can be enabled by setting the `disableChatRepor
 There are currently two strategies for disabling chat reporting:
 - `STRIP_SIGNATURE` (default): removes the signature before sending the message to the clients. 
 The signature is still verified by the server. This is the recommended strategy, although it may cause some
-issues further down the road. In 1.19.1pre1, each message received by the client will trigger a warning log.
+issues further down the road. In 1.19.1-rc1, each message received by the client will trigger a warning log.
 - `CONVERT_TO_SERVER_MESSAGE`: converts the message to a server message, effectively removing any player
 information tied to the message. It will probably break most mods modifying the chat.
 
