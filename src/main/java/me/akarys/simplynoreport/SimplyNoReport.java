@@ -14,7 +14,7 @@ public class SimplyNoReport implements ModInitializer {
 	public static final GameRules.Key<GameRules.BooleanRule> DISABLE_CHAT_REPORT =
 			GameRuleRegistry.register("disableChatReport", GameRules.Category.CHAT, GameRuleFactory.createBooleanRule(false));
 	public static final GameRules.Key<EnumRule<DisableChatReportStrategy>> DISABLE_CHAT_REPORT_STRATEGY =
-			GameRuleRegistry.register("disableChatReportStrategy", GameRules.Category.CHAT, GameRuleFactory.createEnumRule(DisableChatReportStrategy.STRIP_SIGNATURE));
+			GameRuleRegistry.register("disableChatReportStrategy", GameRules.Category.CHAT, GameRuleFactory.createEnumRule(DisableChatReportStrategy.CONVERT_TO_SERVER_MESSAGE));
 	public static final GameRules.Key<GameRules.BooleanRule> SEND_SIGNATURES_TO_OPERATORS =
 			GameRuleRegistry.register("sendSignaturesToOperators", GameRules.Category.CHAT, GameRuleFactory.createBooleanRule(true));
 

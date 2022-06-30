@@ -62,7 +62,7 @@ abstract public class MixinServerPlayNetworkHandler {
                     .append(chatPacket.sender().name())
                     .append("> ")
                     .append(chatPacket.unsignedContent().orElse(chatPacket.signedContent())),
-                1
+                false
             );
         };
     }
