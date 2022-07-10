@@ -3,6 +3,8 @@ package me.akarys.simplynoreport.mixin;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.network.Packet;
 import net.minecraft.network.encryption.NetworkEncryptionUtils;
+import net.minecraft.network.message.MessageSignature;
+import net.minecraft.network.message.SignedMessage;
 import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
 import net.minecraft.server.MinecraftServer;
@@ -44,34 +46,48 @@ abstract public class MixinServerPlayNetworkHandler {
         LOGGER.debug("Stripping signature for {}", target.getName());
         switch (this.server.getOverworld().getGameRules().get(DISABLE_CHAT_REPORT_STRATEGY).get()) {
             case STRIP_SIGNATURE -> {
+                SignedMessage updatedMessage = new SignedMessage(
+                        chatPacket.message().signedHeader(),
+                        MessageSignature.field_39811,  // Empty signature
+                        chatPacket.message().signedBody(),
+                        chatPacket.message().unsignedContent()
+                );
+
                 return new ChatMessageS2CPacket(
-                        chatPacket.signedContent(),
-                        chatPacket.unsignedContent(),
-                        chatPacket.typeId(),
-                        chatPacket.sender(),
-                        chatPacket.timestamp(),
-                        NetworkEncryptionUtils.SignatureData.NONE
+                        updatedMessage,
+                        chatPacket.chatType()
                 );
             }
             case CONVERT_TO_SERVER_MESSAGE -> {
                 MutableText content;
 
-                // Whisper
-                if (chatPacket.typeId() == 2) {
+                // Incoming whispers
+                if (chatPacket.chatType().chatType() == 2) {
                     content = MutableText.of(TextContent.EMPTY)
-                        .append(chatPacket.sender().name())
+                        .append(chatPacket.chatType().name())
                         .append(" whispers to you: ")
-                        .append(chatPacket.unsignedContent().orElse(chatPacket.signedContent()))
+                        .append(chatPacket.message().getContent())
                         .setStyle(Style.EMPTY
-                            .withColor(TextColor.parse("gray"))
-                            .withItalic(true)
+                                .withColor(TextColor.parse("gray"))
+                                .withItalic(true)
+                        );
+                // Outgoing whispers
+                } else if (chatPacket.chatType().chatType() == 3) {
+                    content = MutableText.of(TextContent.EMPTY)
+                        .append("You whisper to ")
+                        .append(chatPacket.chatType().targetName())
+                        .append(": ")
+                        .append(chatPacket.message().getContent())
+                        .setStyle(Style.EMPTY
+                                .withColor(TextColor.parse("gray"))
+                                .withItalic(true)
                         );
                 } else {
                     content = MutableText.of(TextContent.EMPTY)
                         .append("<")
-                        .append(chatPacket.sender().name())
+                        .append(chatPacket.chatType().name())
                         .append("> ")
-                        .append(chatPacket.unsignedContent().orElse(chatPacket.signedContent()));
+                        .append(chatPacket.message().getContent());
                 }
 
                 return new GameMessageS2CPacket(
