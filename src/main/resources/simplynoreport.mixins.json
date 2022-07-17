@@ -4,7 +4,8 @@
   "package": "me.akarys.simplynoreport.mixin",
   "compatibilityLevel": "JAVA_17",
   "server": [
-    "MixinServerPlayNetworkHandler"
+    "MixinServerPlayNetworkHandler",
+    "MixinLastSeenMessagesValidator"
   ],
   "injectors": {
     "defaultRequire": 1

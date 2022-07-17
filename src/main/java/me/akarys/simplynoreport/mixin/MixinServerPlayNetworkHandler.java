@@ -2,8 +2,7 @@ package me.akarys.simplynoreport.mixin;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.network.Packet;
-import net.minecraft.network.encryption.NetworkEncryptionUtils;
-import net.minecraft.network.message.MessageSignature;
+import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.network.message.SignedMessage;
 import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
@@ -35,36 +34,30 @@ abstract public class MixinServerPlayNetworkHandler {
             return packet;
         }
 
-        // We don't want to strip the signature if the player is OP and the gamerule is set to true
         GameProfile target = this.player.getGameProfile();
-
-        if (target != null && this.server.getPlayerManager().isOperator(target) && this.server.getOverworld().getGameRules().getBoolean(SEND_SIGNATURES_TO_OPERATORS)) {
-            LOGGER.debug("Not stripping signature for {}", target.getName());
-            return packet;
-        }
-
         LOGGER.debug("Stripping signature for {}", target.getName());
+
         switch (this.server.getOverworld().getGameRules().get(DISABLE_CHAT_REPORT_STRATEGY).get()) {
             case STRIP_SIGNATURE -> {
                 SignedMessage updatedMessage = new SignedMessage(
                         chatPacket.message().signedHeader(),
-                        MessageSignature.field_39811,  // Empty signature
+                        MessageSignatureData.EMPTY,
                         chatPacket.message().signedBody(),
                         chatPacket.message().unsignedContent()
                 );
 
                 return new ChatMessageS2CPacket(
                         updatedMessage,
-                        chatPacket.chatType()
+                        chatPacket.serializedParameters()
                 );
             }
             case CONVERT_TO_SERVER_MESSAGE -> {
                 MutableText content;
 
                 // Incoming whispers
-                if (chatPacket.chatType().chatType() == 2) {
+                if (chatPacket.serializedParameters().typeId() == 2) {
                     content = MutableText.of(TextContent.EMPTY)
-                        .append(chatPacket.chatType().name())
+                        .append(chatPacket.serializedParameters().name())
                         .append(" whispers to you: ")
                         .append(chatPacket.message().getContent())
                         .setStyle(Style.EMPTY
@@ -72,10 +65,10 @@ abstract public class MixinServerPlayNetworkHandler {
                                 .withItalic(true)
                         );
                 // Outgoing whispers
-                } else if (chatPacket.chatType().chatType() == 3) {
+                } else if (chatPacket.serializedParameters().typeId() == 3) {
                     content = MutableText.of(TextContent.EMPTY)
                         .append("You whisper to ")
-                        .append(chatPacket.chatType().targetName())
+                        .append(chatPacket.serializedParameters().targetName())
                         .append(": ")
                         .append(chatPacket.message().getContent())
                         .setStyle(Style.EMPTY
@@ -85,7 +78,7 @@ abstract public class MixinServerPlayNetworkHandler {
                 } else {
                     content = MutableText.of(TextContent.EMPTY)
                         .append("<")
-                        .append(chatPacket.chatType().name())
+                        .append(chatPacket.serializedParameters().name())
                         .append("> ")
                         .append(chatPacket.message().getContent());
                 }

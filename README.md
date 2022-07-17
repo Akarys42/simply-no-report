@@ -5,9 +5,15 @@ It is **disabled by default** to let everyone decide what they want to do.
 
 Configuration is done through gamerules.
 
+This mod can be found on [Curseforge](https://www.curseforge.com/minecraft/mc-mods/simply-no-report/)
+and [Modrinth](https://www.modrinth.com/mods/simply-no-report/).
+
 ## Usage
 
 This mod is server side only. It can be enabled by setting the `disableChatReport` gamerule to `true`.
+
+Turning the mod off may cause one client to get disconnected to catch up with the cryptographic chain.
+Everything will be back to normal after that.
 
 ## Strategies
 
@@ -23,8 +29,3 @@ The strategy can be changed by setting the `disableChatReportStrategy` gamerule.
 
 No matter what strategy you choose, we highly recommend you to clearly communicate to your users that chat
 reporting is disabled.
-
-## Operator Bypass
-
-Operators will continue to receive signed messages. This feature can be disabled using the 
-`sendSignaturesToOperators` gamerule.
