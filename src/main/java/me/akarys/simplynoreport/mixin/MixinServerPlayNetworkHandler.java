@@ -6,6 +6,7 @@ import net.minecraft.network.message.MessageSignatureData;
 import net.minecraft.network.message.SignedMessage;
 import net.minecraft.network.packet.s2c.play.ChatMessageS2CPacket;
 import net.minecraft.network.packet.s2c.play.GameMessageS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -16,6 +17,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
+import static me.akarys.simplynoreport.DisableChatReportStrategy.STRIP_SIGNATURE;
 import static me.akarys.simplynoreport.SimplyNoReport.*;
 
 @Mixin(ServerPlayNetworkHandler.class)
@@ -24,16 +26,7 @@ abstract public class MixinServerPlayNetworkHandler {
 
     @Shadow @Final private MinecraftServer server;
 
-    @ModifyVariable(at = @At("HEAD"), index = 1, method = "sendPacket(Lnet/minecraft/network/Packet;Lio/netty/util/concurrent/GenericFutureListener;)V", argsOnly = true)
-    private Packet sendPacket(Packet packet) {
-        if (!(packet instanceof ChatMessageS2CPacket chatPacket)) {
-            return packet;
-        }
-
-        if (!this.server.getOverworld().getGameRules().getBoolean(DISABLE_CHAT_REPORT)) {
-            return packet;
-        }
-
+    private Packet handleChatMessage(ChatMessageS2CPacket chatPacket) {
         GameProfile target = this.player.getGameProfile();
         LOGGER.debug("Stripping signature for {}", target.getName());
 
@@ -57,38 +50,74 @@ abstract public class MixinServerPlayNetworkHandler {
                 // Incoming whispers
                 if (chatPacket.serializedParameters().typeId() == 2) {
                     content = MutableText.of(TextContent.EMPTY)
-                        .append(chatPacket.serializedParameters().name())
-                        .append(" whispers to you: ")
-                        .append(chatPacket.message().getContent())
-                        .setStyle(Style.EMPTY
-                                .withColor(TextColor.parse("gray"))
-                                .withItalic(true)
-                        );
-                // Outgoing whispers
+                            .append(chatPacket.serializedParameters().name())
+                            .append(" whispers to you: ")
+                            .append(chatPacket.message().getContent())
+                            .setStyle(Style.EMPTY
+                                    .withColor(TextColor.parse("gray"))
+                                    .withItalic(true)
+                            );
+                    // Outgoing whispers
                 } else if (chatPacket.serializedParameters().typeId() == 3) {
                     content = MutableText.of(TextContent.EMPTY)
-                        .append("You whisper to ")
-                        .append(chatPacket.serializedParameters().targetName())
-                        .append(": ")
-                        .append(chatPacket.message().getContent())
-                        .setStyle(Style.EMPTY
-                                .withColor(TextColor.parse("gray"))
-                                .withItalic(true)
-                        );
+                            .append("You whisper to ")
+                            .append(chatPacket.serializedParameters().targetName())
+                            .append(": ")
+                            .append(chatPacket.message().getContent())
+                            .setStyle(Style.EMPTY
+                                    .withColor(TextColor.parse("gray"))
+                                    .withItalic(true)
+                            );
                 } else {
                     content = MutableText.of(TextContent.EMPTY)
-                        .append("<")
-                        .append(chatPacket.serializedParameters().name())
-                        .append("> ")
-                        .append(chatPacket.message().getContent());
+                            .append("<")
+                            .append(chatPacket.serializedParameters().name())
+                            .append("> ")
+                            .append(chatPacket.message().getContent());
                 }
 
                 return new GameMessageS2CPacket(
-                    content,
-                    false
+                        content,
+                        false
                 );
             }
         };
+        return chatPacket;
+    }
+
+    private PlayerListS2CPacket handlePlayerList(PlayerListS2CPacket playerListPacket) {
+        if (this.server.getOverworld().getGameRules().get(DISABLE_CHAT_REPORT_STRATEGY).get() == STRIP_SIGNATURE) {
+            PlayerListS2CPacket newPacket = new PlayerListS2CPacket(playerListPacket.getAction());
+
+            playerListPacket.getEntries().forEach(entry -> {
+                newPacket.getEntries().add(new PlayerListS2CPacket.Entry(
+                        entry.getProfile(),
+                        entry.getLatency(),
+                        entry.getGameMode(),
+                        entry.getDisplayName(),
+                        null
+                ));
+            });
+
+            return newPacket;
+        }
+        return playerListPacket;
+    }
+
+    @ModifyVariable(at = @At("HEAD"), index = 1, method = "sendPacket(Lnet/minecraft/network/Packet;Lio/netty/util/concurrent/GenericFutureListener;)V", argsOnly = true)
+    private Packet sendPacket(Packet packet) {
+        if (!this.server.getOverworld().getGameRules().getBoolean(DISABLE_CHAT_REPORT)) {
+            return packet;
+        }
+
+        if (packet instanceof ChatMessageS2CPacket chatPacket) {
+            return handleChatMessage(chatPacket);
+        }
+
+        if (packet instanceof PlayerListS2CPacket playerListPacket) {
+            return handlePlayerList(playerListPacket);
+        }
+
         return packet;
     }
 }

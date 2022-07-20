@@ -12,8 +12,8 @@ and [Modrinth](https://www.modrinth.com/mods/simply-no-report/).
 
 This mod is server side only. It can be enabled by setting the `disableChatReport` gamerule to `true`.
 
-Turning the mod off may cause one client to get disconnected to catch up with the cryptographic chain.
-Everything will be back to normal after that.
+Turning the mod off may cause one or all clients to get disconnected to catch up with the cryptographic chain
+or sync signing keys. Everything will be back to normal after that.
 
 ## Strategies
 
