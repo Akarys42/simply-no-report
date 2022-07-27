@@ -36,7 +36,8 @@ abstract public class MixinServerPlayNetworkHandler {
                         chatPacket.message().signedHeader(),
                         MessageSignatureData.EMPTY,
                         chatPacket.message().signedBody(),
-                        chatPacket.message().unsignedContent()
+                        chatPacket.message().unsignedContent(),
+                        chatPacket.message().filterMask()
                 );
 
                 return new ChatMessageS2CPacket(
@@ -45,36 +46,9 @@ abstract public class MixinServerPlayNetworkHandler {
                 );
             }
             case CONVERT_TO_SERVER_MESSAGE -> {
-                MutableText content;
-
-                // Incoming whispers
-                if (chatPacket.serializedParameters().typeId() == 2) {
-                    content = MutableText.of(TextContent.EMPTY)
-                            .append(chatPacket.serializedParameters().name())
-                            .append(" whispers to you: ")
-                            .append(chatPacket.message().getContent())
-                            .setStyle(Style.EMPTY
-                                    .withColor(TextColor.parse("gray"))
-                                    .withItalic(true)
-                            );
-                    // Outgoing whispers
-                } else if (chatPacket.serializedParameters().typeId() == 3) {
-                    content = MutableText.of(TextContent.EMPTY)
-                            .append("You whisper to ")
-                            .append(chatPacket.serializedParameters().targetName())
-                            .append(": ")
-                            .append(chatPacket.message().getContent())
-                            .setStyle(Style.EMPTY
-                                    .withColor(TextColor.parse("gray"))
-                                    .withItalic(true)
-                            );
-                } else {
-                    content = MutableText.of(TextContent.EMPTY)
-                            .append("<")
-                            .append(chatPacket.serializedParameters().name())
-                            .append("> ")
-                            .append(chatPacket.message().getContent());
-                }
+                Text content = chatPacket.serializedParameters()
+                        .toParameters(this.server.getRegistryManager()).get()
+                        .applyChatDecoration(chatPacket.message().getContent());
 
                 return new GameMessageS2CPacket(
                         content,
@@ -104,7 +78,7 @@ abstract public class MixinServerPlayNetworkHandler {
         return playerListPacket;
     }
 
-    @ModifyVariable(at = @At("HEAD"), index = 1, method = "sendPacket(Lnet/minecraft/network/Packet;Lio/netty/util/concurrent/GenericFutureListener;)V", argsOnly = true)
+    @ModifyVariable(at = @At("HEAD"), index = 1, method = "sendPacket*", argsOnly = true)
     private Packet sendPacket(Packet packet) {
         if (!this.server.getOverworld().getGameRules().getBoolean(DISABLE_CHAT_REPORT)) {
             return packet;
