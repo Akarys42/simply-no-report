@@ -6,7 +6,7 @@ It is **disabled by default** to let everyone decide what they want to do.
 Configuration is done through gamerules.
 
 This mod can be found on [Curseforge](https://www.curseforge.com/minecraft/mc-mods/simply-no-report/)
-and [Modrinth](https://www.modrinth.com/mods/simply-no-report/).
+and [Modrinth](https://www.modrinth.com/mod/simply-no-report/).
 
 ## Usage
 
